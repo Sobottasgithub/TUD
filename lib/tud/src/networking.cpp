@@ -3,6 +3,9 @@
 #include <iostream>
 #include <sys/poll.h>
 #include <netinet/in.h>
+#include <vector>
+#include <mutex>
+#include <algorithm>
 
 int Networking::sendMessageTo(int socket, const sockaddr_in& broadcast, std::string payload) {
   if (sendto(socket, payload.data(), payload.size(), 0, (struct sockaddr*)&broadcast, sizeof(broadcast)) < 0) {
@@ -32,4 +35,14 @@ std::string Networking::receiveMessage(int socket) {
       return data;
   }
   return data;
+}
+
+std::vector<std::string> Networking::getDiscoveredAdresses() {
+    std::lock_guard<std::mutex> lock(mtx);
+    return discoveredAddresses;
+}
+
+void Networking::removeDiscoveredAddress(std::string address) {
+    std::lock_guard<std::mutex> lock(mtx);
+    discoveredAddresses.erase(find(discoveredAddresses.begin(), discoveredAddresses.end(), address));
 }
