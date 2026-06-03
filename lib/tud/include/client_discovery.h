@@ -3,10 +3,12 @@
 
 #include "networking.h"
 
+#include <string>
+
 class ClientDiscovery: public Networking
 {
     public:
-      ClientDiscovery();
+      ClientDiscovery(std::string interface);
       void discoveryCycle();
 };
 

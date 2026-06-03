@@ -2,8 +2,9 @@
 
 #include <iostream>
 
-ServerDiscovery::ServerDiscovery() {
-  std::wcout << "Hello from serverDiscovery" << std::endl;
+ServerDiscovery::ServerDiscovery(std::string interface) {
+    this->containerIP = getLocalIpAddress(interface);
+    this->broadcastIP = getBroadcastIpAddress();
 }
 
 void discoveryCycle() {

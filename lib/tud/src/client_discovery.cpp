@@ -2,10 +2,10 @@
 
 #include <iostream>
 
-ClientDiscovery::ClientDiscovery() {
-  std::wcout << "Hello from clientDiscovery" << std::endl;
+ClientDiscovery::ClientDiscovery(std::string interface) {
+    this->containerIP = getLocalIpAddress(interface);
 }
 
 void discoveryCycle() {
-  
+    std::wcout << "Start udp discovery..." << std::endl;
 }

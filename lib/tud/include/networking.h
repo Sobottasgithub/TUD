@@ -22,6 +22,7 @@ class Networking
 
         std::vector<std::string> discoveredAddresses = {};
         std::mutex mtx;
+        std::string containerIP;
 };
 
 #endif
