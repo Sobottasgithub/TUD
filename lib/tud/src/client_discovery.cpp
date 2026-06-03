@@ -5,3 +5,7 @@
 ClientDiscovery::ClientDiscovery() {
   std::wcout << "Hello from clientDiscovery" << std::endl;
 }
+
+void discoveryCycle() {
+  
+}

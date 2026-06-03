@@ -7,6 +7,7 @@ class ClientDiscovery: public Networking
 {
     public:
       ClientDiscovery();
+      void discoveryCycle();
 };
 
 #endif
