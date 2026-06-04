@@ -6,6 +6,8 @@ ClientDiscovery::ClientDiscovery(std::string interface) {
     this->containerIP = getLocalIpAddress(interface);
 }
 
-void discoveryCycle() {
-    std::wcout << "Start udp discovery..." << std::endl;
+void ClientDiscovery::discoveryCycle() {
+    while (true) {
+        std::wcout << "Start udp discovery..." << std::endl;
+    }
 }

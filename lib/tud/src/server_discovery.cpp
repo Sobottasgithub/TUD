@@ -7,6 +7,8 @@ ServerDiscovery::ServerDiscovery(std::string interface) {
     this->broadcastIP = getBroadcastIpAddress();
 }
 
-void discoveryCycle() {
-  
+void ServerDiscovery::discoveryCycle() {
+    while (true) {
+        std::wcout << "Start udp discovery..." << std::endl;
+    }
 }
