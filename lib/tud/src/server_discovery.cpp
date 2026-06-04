@@ -6,13 +6,18 @@
 #include <arpa/inet.h>
 #include <thread>
 #include <algorithm>
+#include <optional>
 
-ServerDiscovery::ServerDiscovery(std::string interface, int inPort, int outPort) {
+ServerDiscovery::ServerDiscovery(std::string interface, int inPort, int outPort, std::optional<std::string> identifier) {
     this->containerIP = getLocalIpAddress(interface);
     this->broadcastIP = getBroadcastIpAddress();
 
     this->inPort = inPort;
     this->outPort = outPort;
+
+    if(identifier.has_value()) {
+        this->identifier = identifier.value();
+    }
 }
 
 void ServerDiscovery::discoveryCycle() {

@@ -10,6 +10,8 @@
 #include <net/if.h>
 #include <sstream>
 #include <arpa/inet.h>
+#include <regex>
+#include <string>
 
 int Networking::sendMessageTo(int socket, const sockaddr_in& broadcast, std::string payload) {
   if (sendto(socket, payload.data(), payload.size(), 0, (struct sockaddr*)&broadcast, sizeof(broadcast)) < 0) {
@@ -149,4 +151,22 @@ bool Networking::isValidIpV4(std::string &ipString) {
     return false;
 
   return true;
+}
+
+bool Networking::hasSameIdentifier(std::string ipString) {
+  std::string identifierPattern = "^" + identifierEscapeRegex(this->identifier);
+  std::regex pattern(identifierPattern);
+  return std::regex_search(ipString, pattern);
+}
+
+std::string Networking::stripIdentifier(std::string ipString) {
+  std::string identifierPattern = "^" + identifierEscapeRegex(this->identifier);
+  std::regex pattern(identifierPattern);
+
+  return std::regex_replace(ipString, pattern, "");
+}
+
+std::string Networking::identifierEscapeRegex(const std::string& identifier) {
+    static const std::regex special_chars(R"([-[\]{}()*+?.,\^$|#\s])");
+    return std::regex_replace(identifier, special_chars, R"(\$&)");
 }

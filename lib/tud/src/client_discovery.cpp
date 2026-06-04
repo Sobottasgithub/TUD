@@ -4,12 +4,17 @@
 #include <cstring>
 #include <arpa/inet.h>
 #include <algorithm>
+#include <optional>
 
-ClientDiscovery::ClientDiscovery(std::string interface, int inPort, int outPort) {
+ClientDiscovery::ClientDiscovery(std::string interface, int inPort, int outPort, std::optional<std::string> identifier) {
     this->containerIP = getLocalIpAddress(interface);
 
     this->inPort = inPort;
     this->outPort = outPort;
+
+    if(identifier.has_value()) {
+        this->identifier = identifier.value();
+    }
 }
 
 void ClientDiscovery::discoveryCycle() {

@@ -4,11 +4,12 @@
 #include "networking.h"
 
 #include <string>
+#include <optional>
 
 class ServerDiscovery: public Networking
 {
     public:
-      ServerDiscovery(std::string interface, int inPort, int outPort);
+      ServerDiscovery(std::string interface, int inPort, int outPort, std::optional<std::string> identifier);
       void discoveryCycle();
 
     private:
