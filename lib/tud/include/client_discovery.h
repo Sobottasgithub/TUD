@@ -8,7 +8,7 @@
 class ClientDiscovery: public Networking
 {
     public:
-      ClientDiscovery(std::string interface);
+      ClientDiscovery(std::string interface, int inPort, int outPort);
       void discoveryCycle();
 };
 

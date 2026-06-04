@@ -12,7 +12,7 @@ int main() {
     std::wcout << "Interface: ";
     std::cin >> interface;
 
-    auto clientDiscovery = std::make_shared<ClientDiscovery>(interface);
+    auto clientDiscovery = std::make_shared<ClientDiscovery>(interface, 4000, 4001);
     std::thread clientDiscoveryThread([clientDiscovery]() {
       clientDiscovery->discoveryCycle();
     });

@@ -7,9 +7,12 @@
 #include <thread>
 #include <algorithm>
 
-ServerDiscovery::ServerDiscovery(std::string interface) {
+ServerDiscovery::ServerDiscovery(std::string interface, int inPort, int outPort) {
     this->containerIP = getLocalIpAddress(interface);
     this->broadcastIP = getBroadcastIpAddress();
+
+    this->inPort = inPort;
+    this->outPort = outPort;
 }
 
 void ServerDiscovery::discoveryCycle() {
@@ -19,7 +22,7 @@ void ServerDiscovery::discoveryCycle() {
     
     int serverSocket;
     struct sockaddr_in broadcast{}, receiverAddress{};
-    const int port = 4000;
+    const int port = this->inPort;
 
     // Create socket
     if ((serverSocket = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
@@ -66,7 +69,7 @@ void ServerDiscovery::discoveryCycle() {
 
 void ServerDiscovery::receiveDiscoveredCycle() {
     int udpSocket;
-    const int port = 4001; 
+    const int port = this->outPort; 
     
     udpSocket = socket(AF_INET, SOCK_DGRAM, 0);
     if (udpSocket < 0) {

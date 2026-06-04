@@ -5,14 +5,17 @@
 #include <arpa/inet.h>
 #include <algorithm>
 
-ClientDiscovery::ClientDiscovery(std::string interface) {
+ClientDiscovery::ClientDiscovery(std::string interface, int inPort, int outPort) {
     this->containerIP = getLocalIpAddress(interface);
+
+    this->inPort = inPort;
+    this->outPort = outPort;
 }
 
 void ClientDiscovery::discoveryCycle() {
     // Udp receive Socket
     int udpSocket;
-    const int port = 4000; 
+    const int port = this->inPort; 
     char buffer[1024];
     
     udpSocket = socket(AF_INET, SOCK_DGRAM, 0);
@@ -37,7 +40,7 @@ void ClientDiscovery::discoveryCycle() {
     // UDP send socket
     int udpSendSocket;
     struct sockaddr_in serverAddress{}, receiverAddress{};
-    const int sendPort = 4001;
+    const int sendPort = this->outPort;
 
     // Create socket
     if ((udpSendSocket = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
