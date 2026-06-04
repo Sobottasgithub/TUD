@@ -3,10 +3,19 @@
 
 #include "networking.h"
 
+#include <string>
+
 class ServerDiscovery: public Networking
 {
     public:
-      ServerDiscovery();
+      ServerDiscovery(std::string interface, int inPort, int outPort);
+      void discoveryCycle();
+
+    private:
+      std::string broadcastIP;
+
+      void receiveDiscoveredCycle();
+
 };
 
 #endif
