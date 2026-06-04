@@ -5,6 +5,7 @@
 #include <cstring>
 #include <arpa/inet.h>
 #include <thread>
+#include <algorithm>
 
 ServerDiscovery::ServerDiscovery(std::string interface) {
     this->containerIP = getLocalIpAddress(interface);
@@ -87,7 +88,11 @@ void ServerDiscovery::receiveDiscoveredCycle() {
     }
 
     while (true) {
-        std::wcout << "Answere: "<< receiveMessage(udpSocket).c_str() << std::endl;
+        std::string newAddress = receiveMessage(udpSocket);
+        if(std::find(discoveredAddresses.begin(), discoveredAddresses.end(), newAddress) == discoveredAddresses.end()) {
+            std::wcout << "New Address found: " << newAddress.c_str() << std::endl;
+            discoveredAddresses.push_back(newAddress);
+        }
     }
 
 }

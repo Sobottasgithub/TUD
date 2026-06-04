@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cstring>
 #include <arpa/inet.h>
+#include <algorithm>
 
 ClientDiscovery::ClientDiscovery(std::string interface) {
     this->containerIP = getLocalIpAddress(interface);
@@ -58,7 +59,10 @@ void ClientDiscovery::discoveryCycle() {
         // Get UDP Discovery packet
         std::string masterIP = receiveMessage(udpSocket);
         if (isValidIpV4(masterIP)) {
-            std::wcout << "Discovered ip: " << masterIP.c_str() << std::endl;
+            if(std::find(discoveredAddresses.begin(), discoveredAddresses.end(), masterIP) == discoveredAddresses.end()) {
+                std::wcout << "New Address found: " << masterIP.c_str() << std::endl;
+                discoveredAddresses.push_back(masterIP);
+            }
 
             // clear garbage
             memset(&serverAddress, 0, sizeof(serverAddress));
