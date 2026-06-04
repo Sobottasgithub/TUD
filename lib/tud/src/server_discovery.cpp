@@ -57,7 +57,6 @@ void ServerDiscovery::discoveryCycle() {
             std::wcout << "Broadcast failed!" << std::endl;
             return;
         }
-        std::wcout << "Broadcast send!" << std::endl;
         usleep(100000);
     }
 
@@ -65,5 +64,30 @@ void ServerDiscovery::discoveryCycle() {
 }
 
 void ServerDiscovery::receiveDiscoveredCycle() {
-    // Implement receive logic on port 4001 here
+    int udpSocket;
+    const int port = 4001; 
+    
+    udpSocket = socket(AF_INET, SOCK_DGRAM, 0);
+    if (udpSocket < 0) {
+        std::wcout << "Create socket failed!" << std::endl;
+        return;
+    }
+
+    int broadcast = 1;
+    setsockopt(udpSocket, SOL_SOCKET, SO_BROADCAST, &broadcast, sizeof(broadcast));
+
+    sockaddr_in nodeAddress{};
+    nodeAddress.sin_family = AF_INET;
+    nodeAddress.sin_addr.s_addr = inet_addr(this->containerIP.c_str());
+    nodeAddress.sin_port = htons(port);
+
+    if (bind(udpSocket, (struct sockaddr*)&nodeAddress, sizeof(nodeAddress)) < 0) {
+        std::wcout << "UDP Socket bind failed!" << std::endl;
+        return;
+    }
+
+    while (true) {
+        std::wcout << "Answere: "<< receiveMessage(udpSocket).c_str() << std::endl;
+    }
+
 }
