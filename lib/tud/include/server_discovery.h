@@ -13,6 +13,9 @@ class ServerDiscovery: public Networking
 
     private:
       std::string broadcastIP;
+
+      void receiveDiscoveredCycle();
+
 };
 
 #endif

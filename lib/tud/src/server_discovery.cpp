@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <cstring>
 #include <arpa/inet.h>
+#include <thread>
 
 ServerDiscovery::ServerDiscovery(std::string interface) {
     this->containerIP = getLocalIpAddress(interface);
@@ -11,6 +12,10 @@ ServerDiscovery::ServerDiscovery(std::string interface) {
 }
 
 void ServerDiscovery::discoveryCycle() {
+    std::thread receiveDiscoveredCycleThread([this]() {
+        receiveDiscoveredCycle();
+    });
+    
     int serverSocket;
     struct sockaddr_in broadcast{}, receiverAddress{};
     const int port = 4000;
@@ -55,4 +60,10 @@ void ServerDiscovery::discoveryCycle() {
         std::wcout << "Broadcast send!" << std::endl;
         usleep(100000);
     }
+
+    receiveDiscoveredCycleThread.join();
+}
+
+void ServerDiscovery::receiveDiscoveredCycle() {
+    // Implement receive logic on port 4001 here
 }
