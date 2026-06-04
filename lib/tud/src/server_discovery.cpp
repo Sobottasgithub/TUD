@@ -90,7 +90,6 @@ void ServerDiscovery::receiveDiscoveredCycle() {
     while (true) {
         std::string newAddress = receiveMessage(udpSocket);
         if(std::find(discoveredAddresses.begin(), discoveredAddresses.end(), newAddress) == discoveredAddresses.end()) {
-            std::wcout << "New Address found: " << newAddress.c_str() << std::endl;
             discoveredAddresses.push_back(newAddress);
         }
     }
