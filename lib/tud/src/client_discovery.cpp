@@ -10,8 +10,6 @@ ClientDiscovery::ClientDiscovery(std::string interface) {
 }
 
 void ClientDiscovery::discoveryCycle() {
-    std::wcout << "Start udp discovery..." << std::endl;
-
     // Udp receive Socket
     int udpSocket;
     const int port = 4000; 
@@ -52,15 +50,12 @@ void ClientDiscovery::discoveryCycle() {
         std::wcout << "Setsockopt failed!" << std::endl;
         return;
     }
-
     
-    std::wcout << "Listening on UDP port " << port << std::endl;
     while (true) {
         // Get UDP Discovery packet
         std::string masterIP = receiveMessage(udpSocket);
         if (isValidIpV4(masterIP)) {
             if(std::find(discoveredAddresses.begin(), discoveredAddresses.end(), masterIP) == discoveredAddresses.end()) {
-                std::wcout << "New Address found: " << masterIP.c_str() << std::endl;
                 discoveredAddresses.push_back(masterIP);
             }
 
