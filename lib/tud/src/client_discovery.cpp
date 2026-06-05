@@ -61,26 +61,30 @@ void ClientDiscovery::discoveryCycle() {
     
     while (true) {
         // Get UDP Discovery packet
-        std::string masterIP = receiveMessage(udpSocket);
-        if (isValidIpV4(masterIP)) {
-            if(std::find(discoveredAddresses.begin(), discoveredAddresses.end(), masterIP) == discoveredAddresses.end()) {
-                discoveredAddresses.push_back(masterIP);
-            }
+        std::string receivedMessage = receiveMessage(udpSocket);
+        if (hasSameIdentifier(receivedMessage)) {
+            std::string masterIP = stripIdentifier(receivedMessage);
+            if (isValidIpV4(masterIP)) {
+                if(std::find(discoveredAddresses.begin(), discoveredAddresses.end(), masterIP) == discoveredAddresses.end()) {
+                    discoveredAddresses.push_back(masterIP);
+                }
 
-            // clear garbage
-            memset(&serverAddress, 0, sizeof(serverAddress));
-            // prepare socket
-            serverAddress.sin_family = AF_INET;
-            serverAddress.sin_port = htons(sendPort);
+                // clear garbage
+                memset(&serverAddress, 0, sizeof(serverAddress));
+                // prepare socket
+                serverAddress.sin_family = AF_INET;
+                serverAddress.sin_port = htons(sendPort);
 
-            if (inet_pton(AF_INET, masterIP.c_str(), &serverAddress.sin_addr) <= 0) {
-                std::wcout << "Invalid broadcast IP" << std::endl;
-                return;
-            }
-            
-            if (sendMessageTo(udpSendSocket, serverAddress, containerIP.c_str()) != 0) {
-                std::wcout << "Broadcast failed!" << std::endl;
-                return;
+                if (inet_pton(AF_INET, masterIP.c_str(), &serverAddress.sin_addr) <= 0) {
+                    std::wcout << "Invalid broadcast IP" << std::endl;
+                    return;
+                }
+
+                std::string message = this->identifier + containerIP;
+                if (sendMessageTo(udpSendSocket, serverAddress, message.c_str()) != 0) {
+                    std::wcout << "Broadcast failed!" << std::endl;
+                    return;
+                }
             }
         }
     }

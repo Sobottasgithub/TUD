@@ -8,7 +8,7 @@ After including TUD to your project you can implement the server like this:
 ```
 
 ```cpp
-auto serverDiscovery = std::make_shared<ServerDiscovery>(interface, 4000, 4001);
+auto serverDiscovery = std::make_shared<ServerDiscovery>(interface, 4000, 4001, "yourNewIdenifier");
 std::thread serverDiscoveryThread([serverDiscovery]() {
   serverDiscovery->discoveryCycle();
 });
@@ -19,7 +19,7 @@ And the client like this:
 ```
 
 ```cpp
-auto clientDiscovery = std::make_shared<ClientDiscovery>(interface, 4000, 4001);
+auto clientDiscovery = std::make_shared<ClientDiscovery>(interface, 4000, 4001, "yourNewIdenifier");
 std::thread clientDiscoveryThread([clientDiscovery]() {
   clientDiscovery->discoveryCycle();
 });
@@ -28,6 +28,7 @@ Both constructors want:
 1. your internet interface (string)
 2. your in port (int)
 3. your out port (int)
+4. your identifier (optional string)
 
 Then you can use it with these functions:
 ```cpp

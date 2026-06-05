@@ -62,7 +62,8 @@ void ServerDiscovery::discoveryCycle() {
     }
 
     while (true) {
-        if (sendMessageTo(serverSocket, broadcast, containerIP.c_str()) != 0) {
+        std::string message = this->identifier + containerIP;
+        if (sendMessageTo(serverSocket, broadcast, message.c_str()) != 0) {
             std::wcout << "Broadcast failed!" << std::endl;
             return;
         }
@@ -96,10 +97,12 @@ void ServerDiscovery::receiveDiscoveredCycle() {
     }
 
     while (true) {
-        std::string newAddress = receiveMessage(udpSocket);
-        if(std::find(discoveredAddresses.begin(), discoveredAddresses.end(), newAddress) == discoveredAddresses.end()) {
-            discoveredAddresses.push_back(newAddress);
+        std::string receivedMessage = receiveMessage(udpSocket);
+        if (hasSameIdentifier(receivedMessage)) {
+            std::string newAddress = stripIdentifier(receivedMessage);
+            if(std::find(discoveredAddresses.begin(), discoveredAddresses.end(), newAddress) == discoveredAddresses.end()) {
+                discoveredAddresses.push_back(newAddress);
+            }
         }
     }
-
 }
