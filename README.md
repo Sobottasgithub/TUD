@@ -8,7 +8,7 @@ After including TUD to your project you can implement the server like this:
 ```
 
 ```cpp
-auto serverDiscovery = std::make_shared<ServerDiscovery>(interface, 4000, 4001, "yourNewIdenifier");
+auto serverDiscovery = std::make_shared<tud::ServerDiscovery>(interface, 4000, 4001, "yourNewIdenifier");
 std::thread serverDiscoveryThread([serverDiscovery]() {
   serverDiscovery->discoveryCycle();
 });
@@ -19,7 +19,7 @@ And the client like this:
 ```
 
 ```cpp
-auto clientDiscovery = std::make_shared<ClientDiscovery>(interface, 4000, 4001, "yourNewIdenifier");
+auto clientDiscovery = std::make_shared<tud::ClientDiscovery>(interface, 4000, 4001, "yourNewIdenifier");
 std::thread clientDiscoveryThread([clientDiscovery]() {
   clientDiscovery->discoveryCycle();
 });
