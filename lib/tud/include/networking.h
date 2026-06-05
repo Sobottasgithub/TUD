@@ -9,7 +9,7 @@
 class Networking
 {
     public:
-        std::vector<std::string> getDiscoveredAdresses();
+        std::vector<std::string> getDiscoveredAddresses();
         void removeDiscoveredAddress(std::string address);
 
         std::string getLocalIpAddress(std::string interface);

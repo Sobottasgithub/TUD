@@ -32,7 +32,7 @@ Both constructors want:
 
 Then you can use it with these functions:
 ```cpp
-std::vector<std::string> getDiscoveredAdresses();
+std::vector<std::string> getDiscoveredAddresses();
 void removeDiscoveredAddress(std::string address);
 
 std::string getLocalIpAddress(std::string interface);

@@ -20,7 +20,7 @@ int main() {
     std::wcout << "~~ Discovered Addresses ~~" << std::endl;
     std::vector<std::string> discoveredAddresses;
     while(true) {
-      std::vector<std::string> newDiscoveries = serverDiscovery->getDiscoveredAdresses();
+      std::vector<std::string> newDiscoveries = serverDiscovery->getDiscoveredAddresses();
       for (int index = 0; index < newDiscoveries.size(); index++) {
         if(std::find(discoveredAddresses.begin(), discoveredAddresses.end(), newDiscoveries[index]) == discoveredAddresses.end()) {
           std::wcout << "--> " << newDiscoveries[index].c_str() << std::endl;

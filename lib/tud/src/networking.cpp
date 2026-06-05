@@ -43,7 +43,7 @@ std::string Networking::receiveMessage(int socket) {
   return data;
 }
 
-std::vector<std::string> Networking::getDiscoveredAdresses() {
+std::vector<std::string> Networking::getDiscoveredAddresses() {
     std::lock_guard<std::mutex> lock(mtx);
     return discoveredAddresses;
 }
