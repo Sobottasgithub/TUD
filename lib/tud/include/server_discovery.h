@@ -6,17 +6,19 @@
 #include <string>
 #include <optional>
 
-class ServerDiscovery: public UdpStructure
-{
-    public:
-      ServerDiscovery(std::string interface, int inPort, int outPort, std::optional<std::string> identifier);
-      void discoveryCycle();
+namespace tud {
+  class ServerDiscovery: public UdpStructure
+  {
+      public:
+        ServerDiscovery(std::string interface, int inPort, int outPort, std::optional<std::string> identifier);
+        void discoveryCycle();
 
-    private:
-      std::string broadcastIP;
+      private:
+        std::string broadcastIP;
 
-      void receiveDiscoveredCycle();
+        void receiveDiscoveredCycle();
 
-};
+  };
+}
 
 #endif

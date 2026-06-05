@@ -13,160 +13,162 @@
 #include <regex>
 #include <string>
 
-int UdpStructure::sendMessageTo(int socket, const sockaddr_in& broadcast, std::string payload) {
-  if (sendto(socket, payload.data(), payload.size(), 0, (struct sockaddr*)&broadcast, sizeof(broadcast)) < 0) {
-      std::wcout << "buffer: Sendto Failed!" << std::endl;
-      return -1;
-  }
-
-  return 0;
-}
-
-std::string UdpStructure::receiveMessage(int socket) {
-  std::string data;
-  pollfd pfd{};
-  pfd.fd = socket;
-  pfd.events = POLLIN;
-
-  int ret = poll(&pfd, 1, 10000);
-
-  int bufferSize = 1024;
-  if (ret > 0 && (pfd.revents & POLLIN)) {
-      char* buffer = new char[bufferSize];
-      ssize_t size = recv(socket, buffer, bufferSize, 0);
-      
-      data = buffer;
-    
-      if (size <= 0) return data;
-      return data;
-  }
-  return data;
-}
-
-std::vector<std::string> UdpStructure::getDiscoveredAddresses() {
-    std::lock_guard<std::mutex> lock(mtx);
-    return discoveredAddresses;
-}
-
-void UdpStructure::removeDiscoveredAddress(std::string address) {
-    std::lock_guard<std::mutex> lock(mtx);
-    discoveredAddresses.erase(find(discoveredAddresses.begin(), discoveredAddresses.end(), address));
-}
-
-std::string UdpStructure::getLocalIpAddress(std::string interface) {
-  struct ifaddrs *ifaddr = nullptr;
-
-  // Get linked list of network interfaces
-  if (getifaddrs(&ifaddr) == -1) {
-    return "";
-  }
-
-  std::string result;
-
-  // Iterate through interfaces
-  for (auto *ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next) {
-    if (!ifa->ifa_addr)
-      continue;
-
-    if (ifa->ifa_addr->sa_family == AF_INET) {
-      auto *addr = reinterpret_cast<struct sockaddr_in *>(ifa->ifa_addr);
-      char ip[INET_ADDRSTRLEN];
-      inet_ntop(AF_INET, &addr->sin_addr, ip, sizeof(ip));
-
-      // Docker containers typically use eth0
-      if (std::string(ifa->ifa_name) == interface) {
-        result = ip;
-        break;
-      }
+namespace tud {
+  int UdpStructure::sendMessageTo(int socket, const sockaddr_in& broadcast, std::string payload) {
+    if (sendto(socket, payload.data(), payload.size(), 0, (struct sockaddr*)&broadcast, sizeof(broadcast)) < 0) {
+        std::wcout << "buffer: Sendto Failed!" << std::endl;
+        return -1;
     }
+
+    return 0;
   }
 
-  freeifaddrs(ifaddr);
-  return result;
-}
+  std::string UdpStructure::receiveMessage(int socket) {
+    std::string data;
+    pollfd pfd{};
+    pfd.fd = socket;
+    pfd.events = POLLIN;
 
-std::string UdpStructure::getBroadcastIpAddress() {
-  struct ifaddrs *ifaddr = nullptr;
-  std::string broadcastIP;
+    int ret = poll(&pfd, 1, 10000);
 
-  // Get network interfaces
-  if (getifaddrs(&ifaddr) == -1) {
-    return "";
+    int bufferSize = 1024;
+    if (ret > 0 && (pfd.revents & POLLIN)) {
+        char* buffer = new char[bufferSize];
+        ssize_t size = recv(socket, buffer, bufferSize, 0);
+      
+        data = buffer;
+    
+        if (size <= 0) return data;
+        return data;
+    }
+    return data;
   }
 
-  for (struct ifaddrs *ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next) {
-    if (ifa->ifa_addr == nullptr)
-      continue;
+  std::vector<std::string> UdpStructure::getDiscoveredAddresses() {
+      std::lock_guard<std::mutex> lock(mtx);
+      return discoveredAddresses;
+  }
 
-    // Only consider IPv4 interfaces that are up and support broadcast
-    if (ifa->ifa_addr->sa_family == AF_INET &&
-        (ifa->ifa_flags & IFF_BROADCAST) && (ifa->ifa_flags & IFF_UP) &&
-        !(ifa->ifa_flags & IFF_LOOPBACK)) {
+  void UdpStructure::removeDiscoveredAddress(std::string address) {
+      std::lock_guard<std::mutex> lock(mtx);
+      discoveredAddresses.erase(find(discoveredAddresses.begin(), discoveredAddresses.end(), address));
+  }
 
-      // Ensure the broadcast address exists
-      if (ifa->ifa_broadaddr) {
-        struct sockaddr_in *bcast =
-            reinterpret_cast<struct sockaddr_in *>(ifa->ifa_broadaddr);
+  std::string UdpStructure::getLocalIpAddress(std::string interface) {
+    struct ifaddrs *ifaddr = nullptr;
+
+    // Get linked list of network interfaces
+    if (getifaddrs(&ifaddr) == -1) {
+      return "";
+    }
+
+    std::string result;
+
+    // Iterate through interfaces
+    for (auto *ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next) {
+      if (!ifa->ifa_addr)
+        continue;
+
+      if (ifa->ifa_addr->sa_family == AF_INET) {
+        auto *addr = reinterpret_cast<struct sockaddr_in *>(ifa->ifa_addr);
         char ip[INET_ADDRSTRLEN];
-        if (inet_ntop(AF_INET, &(bcast->sin_addr), ip, INET_ADDRSTRLEN)) {
-          broadcastIP = ip;
-          break; // stop at the first valid one
+        inet_ntop(AF_INET, &addr->sin_addr, ip, sizeof(ip));
+
+        // Docker containers typically use eth0
+        if (std::string(ifa->ifa_name) == interface) {
+          result = ip;
+          break;
         }
       }
     }
+
+    freeifaddrs(ifaddr);
+    return result;
   }
 
-  freeifaddrs(ifaddr);
-  return broadcastIP;
-}
+  std::string UdpStructure::getBroadcastIpAddress() {
+    struct ifaddrs *ifaddr = nullptr;
+    std::string broadcastIP;
 
-bool UdpStructure::isValidIpV4(std::string &ipString) {
-  if (ipString.size() < 7)
-    return false;
-
-  int count = 0;
-  // Seperate Ip Octets
-  std::stringstream stringStream(ipString);
-  while (stringStream.good()) {
-    std::string octet;
-    getline(stringStream, octet, '.');
-
-    if (octet.size() > 1) {
-      if (octet[0] == '0')
-        return false;
+    // Get network interfaces
+    if (getifaddrs(&ifaddr) == -1) {
+      return "";
     }
 
-    for (int index = 0; index < octet.size(); index++) {
-      if (isalpha(octet[index]))
-        return false;
+    for (struct ifaddrs *ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next) {
+      if (ifa->ifa_addr == nullptr)
+        continue;
+
+      // Only consider IPv4 interfaces that are up and support broadcast
+      if (ifa->ifa_addr->sa_family == AF_INET &&
+          (ifa->ifa_flags & IFF_BROADCAST) && (ifa->ifa_flags & IFF_UP) &&
+          !(ifa->ifa_flags & IFF_LOOPBACK)) {
+
+        // Ensure the broadcast address exists
+        if (ifa->ifa_broadaddr) {
+          struct sockaddr_in *bcast =
+              reinterpret_cast<struct sockaddr_in *>(ifa->ifa_broadaddr);
+          char ip[INET_ADDRSTRLEN];
+          if (inet_ntop(AF_INET, &(bcast->sin_addr), ip, INET_ADDRSTRLEN)) {
+            broadcastIP = ip;
+            break; // stop at the first valid one
+          }
+        }
+      }
     }
 
-    if (stoi(octet) > 255)
+    freeifaddrs(ifaddr);
+    return broadcastIP;
+  }
+
+  bool UdpStructure::isValidIpV4(std::string &ipString) {
+    if (ipString.size() < 7)
       return false;
 
-    count++;
+    int count = 0;
+    // Seperate Ip Octets
+    std::stringstream stringStream(ipString);
+    while (stringStream.good()) {
+      std::string octet;
+      getline(stringStream, octet, '.');
+
+      if (octet.size() > 1) {
+        if (octet[0] == '0')
+          return false;
+      }
+
+      for (int index = 0; index < octet.size(); index++) {
+        if (isalpha(octet[index]))
+          return false;
+      }
+
+      if (stoi(octet) > 255)
+        return false;
+
+      count++;
+    }
+
+    if (count != 4)
+      return false;
+
+    return true;
   }
 
-  if (count != 4)
-    return false;
+  bool UdpStructure::hasSameIdentifier(std::string ipString) {
+    std::string identifierPattern = "^" + identifierEscapeRegex(this->identifier);
+    std::regex pattern(identifierPattern);
+    return std::regex_search(ipString, pattern);
+  }
 
-  return true;
-}
+  std::string UdpStructure::stripIdentifier(std::string ipString) {
+    std::string identifierPattern = "^" + identifierEscapeRegex(this->identifier);
+    std::regex pattern(identifierPattern);
 
-bool UdpStructure::hasSameIdentifier(std::string ipString) {
-  std::string identifierPattern = "^" + identifierEscapeRegex(this->identifier);
-  std::regex pattern(identifierPattern);
-  return std::regex_search(ipString, pattern);
-}
+    return std::regex_replace(ipString, pattern, "");
+  }
 
-std::string UdpStructure::stripIdentifier(std::string ipString) {
-  std::string identifierPattern = "^" + identifierEscapeRegex(this->identifier);
-  std::regex pattern(identifierPattern);
-
-  return std::regex_replace(ipString, pattern, "");
-}
-
-std::string UdpStructure::identifierEscapeRegex(const std::string& identifier) {
-    static const std::regex special_chars(R"([-[\]{}()*+?.,\^$|#\s])");
-    return std::regex_replace(identifier, special_chars, R"(\$&)");
+  std::string UdpStructure::identifierEscapeRegex(const std::string& identifier) {
+      static const std::regex special_chars(R"([-[\]{}()*+?.,\^$|#\s])");
+      return std::regex_replace(identifier, special_chars, R"(\$&)");
+  }
 }

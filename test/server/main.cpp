@@ -7,12 +7,14 @@
 #include <vector>
 #include <algorithm>
 
+using namespace tud;
+
 int main() {
     std::string interface;
     std::wcout << "Interface: ";
     std::cin >> interface;
       
-    auto serverDiscovery = std::make_shared<ServerDiscovery>(interface, 4000, 4001, "tud");
+    auto serverDiscovery = std::make_shared<tud::ServerDiscovery>(interface, 4000, 4001, "tud");
     std::thread serverDiscoveryThread([serverDiscovery]() {
       serverDiscovery->discoveryCycle();
     });
