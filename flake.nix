@@ -11,7 +11,7 @@
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
 
-      version = "0.2";
+      version = "0.3";
 
       commonDeps = with pkgs; [
         cmake

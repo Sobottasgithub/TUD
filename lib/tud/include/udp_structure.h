@@ -1,12 +1,12 @@
-#ifndef NETWORKING_H
-#define NETWORKING_H
+#ifndef UDP_STRUCTURE_H
+#define UDP_STRUCTURE_H
 
 #include <string>
 #include <netinet/in.h>
 #include <vector>
 #include <mutex>
 
-class Networking
+class UdpStructure
 {
     public:
         std::vector<std::string> getDiscoveredAddresses();

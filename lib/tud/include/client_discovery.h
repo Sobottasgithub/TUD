@@ -1,12 +1,12 @@
 #ifndef CLIENT_DISCOVERY_H
 #define CLIENT_DISCOVERY_H
 
-#include "networking.h"
+#include "udp_structure.h"
 
 #include <string>
 #include <optional>
 
-class ClientDiscovery: public Networking
+class ClientDiscovery: public UdpStructure
 {
     public:
       ClientDiscovery(std::string interface, int inPort, int outPort, std::optional<std::string> identifier);
