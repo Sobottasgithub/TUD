@@ -1,4 +1,4 @@
-#include "../include/udp_structure.h"
+#include "../include/networking.h"
 
 #include <iostream>
 #include <sys/poll.h>
@@ -14,7 +14,7 @@
 #include <string>
 
 namespace tud {
-  int UdpStructure::sendMessageTo(int socket, const sockaddr_in& broadcast, std::string payload) {
+  int Networking::sendMessageTo(int socket, const sockaddr_in& broadcast, std::string payload) {
     if (sendto(socket, payload.data(), payload.size(), 0, (struct sockaddr*)&broadcast, sizeof(broadcast)) < 0) {
         std::wcout << "buffer: Sendto Failed!" << std::endl;
         return -1;
@@ -23,7 +23,7 @@ namespace tud {
     return 0;
   }
 
-  std::string UdpStructure::receiveMessage(int socket) {
+  std::string Networking::receiveMessage(int socket) {
     std::string data;
     pollfd pfd{};
     pfd.fd = socket;
@@ -44,17 +44,17 @@ namespace tud {
     return data;
   }
 
-  std::vector<std::string> UdpStructure::getDiscoveredAddresses() {
+  std::vector<std::string> Networking::getDiscoveredAddresses() {
       std::lock_guard<std::mutex> lock(mtx);
       return discoveredAddresses;
   }
 
-  void UdpStructure::removeDiscoveredAddress(std::string address) {
+  void Networking::removeDiscoveredAddress(std::string address) {
       std::lock_guard<std::mutex> lock(mtx);
       discoveredAddresses.erase(find(discoveredAddresses.begin(), discoveredAddresses.end(), address));
   }
 
-  std::string UdpStructure::getLocalIpAddress(std::string interface) {
+  std::string Networking::getLocalIpAddress(std::string interface) {
     struct ifaddrs *ifaddr = nullptr;
 
     // Get linked list of network interfaces
@@ -86,7 +86,7 @@ namespace tud {
     return result;
   }
 
-  std::string UdpStructure::getBroadcastIpAddress() {
+  std::string Networking::getBroadcastIpAddress() {
     struct ifaddrs *ifaddr = nullptr;
     std::string broadcastIP;
 
@@ -121,7 +121,7 @@ namespace tud {
     return broadcastIP;
   }
 
-  bool UdpStructure::isValidIpV4(std::string &ipString) {
+  bool Networking::isValidIpV4(std::string &ipString) {
     if (ipString.size() < 7)
       return false;
 
@@ -154,20 +154,20 @@ namespace tud {
     return true;
   }
 
-  bool UdpStructure::hasSameIdentifier(std::string ipString) {
+  bool Networking::hasSameIdentifier(std::string ipString) {
     std::string identifierPattern = "^" + identifierEscapeRegex(this->identifier);
     std::regex pattern(identifierPattern);
     return std::regex_search(ipString, pattern);
   }
 
-  std::string UdpStructure::stripIdentifier(std::string ipString) {
+  std::string Networking::stripIdentifier(std::string ipString) {
     std::string identifierPattern = "^" + identifierEscapeRegex(this->identifier);
     std::regex pattern(identifierPattern);
 
     return std::regex_replace(ipString, pattern, "");
   }
 
-  std::string UdpStructure::identifierEscapeRegex(const std::string& identifier) {
+  std::string Networking::identifierEscapeRegex(const std::string& identifier) {
       static const std::regex special_chars(R"([-[\]{}()*+?.,\^$|#\s])");
       return std::regex_replace(identifier, special_chars, R"(\$&)");
   }

@@ -1,5 +1,5 @@
-#ifndef UDP_STRUCTURE_H
-#define UDP_STRUCTURE_H
+#ifndef Networking_H
+#define Networking_H
 
 #include <string>
 #include <netinet/in.h>
@@ -7,7 +7,7 @@
 #include <mutex>
 
 namespace tud {
-    class UdpStructure
+    class Networking
     {
         public:
             std::vector<std::string> getDiscoveredAddresses();
