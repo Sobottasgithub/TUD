@@ -10,7 +10,7 @@
 
 namespace tud {
     ClientDiscovery::ClientDiscovery(std::string interface, int inPort, int outPort, std::optional<std::string> identifier) {
-        logger->configure("ClientUdpDiscovery", true);
+        // logger->configure("ClientUdpDiscovery", true);
         
         this->containerIP = getLocalIpAddress(interface);
 

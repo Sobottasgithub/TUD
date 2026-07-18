@@ -12,7 +12,7 @@
 
 namespace tud {
     ServerDiscovery::ServerDiscovery(std::string interface, int inPort, int outPort, std::optional<std::string> identifier) {
-        logger->configure("ServerUdpDiscovery", true);
+        // logger->configure("ServerUdpDiscovery", true);
 
         this->containerIP = getLocalIpAddress(interface);
         this->broadcastIP = getBroadcastIpAddress();
