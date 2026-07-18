@@ -3,21 +3,32 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+
+    tablog = {
+      url = "github:Sobottasgithub/tablog";
+    };
   };
 
   outputs =
-    { self, nixpkgs }:
+    {
+      self,
+      nixpkgs,
+      tablog,
+    }:
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
 
       version = "0.5";
 
+      libtablog = tablog.packages.${system}.lib;
+
       commonDeps = with pkgs; [
         cmake
         gcc
         gnumake
         libtasn1
+        libtablog
       ];
 
       mkTUDPackage =
@@ -66,7 +77,7 @@
           };
         in
         {
-          inherit lib;
+          inherit lib libtablog;
 
           client = mkTUDPackage {
             pname = "tud-client";

@@ -15,5 +15,7 @@ target_include_directories(tud PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
+target_link_libraries(tud PRIVATE tablog)
+
 install(TARGETS tud DESTINATION lib)
 install(DIRECTORY include/ DESTINATION include)

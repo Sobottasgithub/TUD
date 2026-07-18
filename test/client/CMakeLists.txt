@@ -9,5 +9,6 @@ file(GLOB_RECURSE SOURCES "./*.cpp" "./*.h")
 add_executable(tud-client ${SOURCES})
 
 target_link_libraries(tud-client PRIVATE tud)
+target_link_libraries(tud-client PRIVATE tablog)
 
 install(TARGETS tud-client DESTINATION bin)
