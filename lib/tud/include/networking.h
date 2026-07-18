@@ -1,6 +1,8 @@
 #ifndef Networking_H
 #define Networking_H
 
+#include <tablog.h>
+
 #include <string>
 #include <netinet/in.h>
 #include <vector>
@@ -18,6 +20,8 @@ namespace tud {
             bool isValidIpV4(std::string &ipString);
         
         protected:
+            tablog::Tablog* logger = &tablog::Tablog::getInstance();
+            
             int sendMessageTo(int socket, const sockaddr_in& broadcast, std::string payload);
             std::string receiveMessage(int socket);
 

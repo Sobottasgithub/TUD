@@ -1,5 +1,7 @@
 #include "../include/networking.h"
 
+#include <tablog.h>
+
 #include <iostream>
 #include <sys/poll.h>
 #include <netinet/in.h>
@@ -16,7 +18,7 @@
 namespace tud {
   int Networking::sendMessageTo(int socket, const sockaddr_in& broadcast, std::string payload) {
     if (sendto(socket, payload.data(), payload.size(), 0, (struct sockaddr*)&broadcast, sizeof(broadcast)) < 0) {
-        std::wcout << "buffer: Sendto Failed!" << std::endl;
+        logger->log(tablog::ERROR, "buffer: Sendto Failed!");
         return -1;
     }
 

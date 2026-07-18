@@ -1,5 +1,7 @@
 #include "../include/client_discovery.h"
 
+#include <tablog.h>
+
 #include <iostream>
 #include <cstring>
 #include <arpa/inet.h>
@@ -8,6 +10,8 @@
 
 namespace tud {
     ClientDiscovery::ClientDiscovery(std::string interface, int inPort, int outPort, std::optional<std::string> identifier) {
+        logger->configure("ClientUdpDiscovery", true);
+        
         this->containerIP = getLocalIpAddress(interface);
 
         this->inPort = inPort;
@@ -26,7 +30,7 @@ namespace tud {
     
         udpSocket = socket(AF_INET, SOCK_DGRAM, 0);
         if (udpSocket < 0) {
-            std::wcout << "Create socket failed!" << std::endl;
+            logger->log(tablog::ERROR, "Create socket failed!");
             return;
         }
 
@@ -39,7 +43,7 @@ namespace tud {
         nodeAddress.sin_port = htons(port);
 
         if (bind(udpSocket, (struct sockaddr*)&nodeAddress, sizeof(nodeAddress)) < 0) {
-            std::wcout << "UDP Socket bind failed!" << std::endl;
+            logger->log(tablog::ERROR, "UDP Socket bind failed!");
             return;
         }
 
@@ -50,13 +54,13 @@ namespace tud {
 
         // Create socket
         if ((udpSendSocket = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-            std::wcout << "Failed to create Socket!" << std::endl;
+            logger->log(tablog::ERROR, "Failed to create Socket!");
             return;
         }
         // Allow reuse
         int reuse = 1;
         if (setsockopt(udpSendSocket, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) < 0) {
-            std::wcout << "Setsockopt failed!" << std::endl;
+            logger->log(tablog::ERROR, "Setsockopt failed!");
             return;
         }
     
@@ -77,13 +81,13 @@ namespace tud {
                     serverAddress.sin_port = htons(sendPort);
 
                     if (inet_pton(AF_INET, masterIP.c_str(), &serverAddress.sin_addr) <= 0) {
-                        std::wcout << "Invalid broadcast IP" << std::endl;
+                        logger->log(tablog::ERROR, "Invalid broadcast IP");
                         return;
                     }
 
                     std::string message = this->identifier + containerIP;
                     if (sendMessageTo(udpSendSocket, serverAddress, message.c_str()) != 0) {
-                        std::wcout << "Broadcast failed!" << std::endl;
+                        logger->log(tablog::ERROR, "Broadcast failed!");
                         return;
                     }
                 }

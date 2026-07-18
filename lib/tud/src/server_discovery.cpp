@@ -1,5 +1,7 @@
 #include "../include/server_discovery.h"
 
+#include <tablog.h>
+
 #include <iostream>
 #include <unistd.h>
 #include <cstring>
@@ -10,6 +12,8 @@
 
 namespace tud {
     ServerDiscovery::ServerDiscovery(std::string interface, int inPort, int outPort, std::optional<std::string> identifier) {
+        logger->configure("ServerUdpDiscovery", true);
+
         this->containerIP = getLocalIpAddress(interface);
         this->broadcastIP = getBroadcastIpAddress();
 
@@ -32,20 +36,20 @@ namespace tud {
 
         // Create socket
         if ((serverSocket = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-            std::wcout << "Failed to create Socket!" << std::endl;
+            logger->log(tablog::ERROR, "Failed to create Socket!");
             return;
         }
         // Enable broadcast
         int broadcastBind = 1;
         if (setsockopt(serverSocket, SOL_SOCKET, SO_BROADCAST, &broadcastBind, sizeof(broadcastBind)) < 0) {
-            std::wcout << "Failed to enable broadcast!" << std::endl;
+            logger->log(tablog::ERROR, "Failed to enable broadcast!");
             close(serverSocket);
             return;
         }
         // Allow reuse
         int reuse = 1;
         if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) < 0) {
-            std::wcout << "Setsockopt failed!" << std::endl;
+            logger->log(tablog::ERROR, "Setsockopt failed!");
             close(serverSocket);
             return;
         }
@@ -57,7 +61,7 @@ namespace tud {
         broadcast.sin_port = htons(port);
 
         if (inet_pton(AF_INET, broadcastIP.c_str(), &broadcast.sin_addr) <= 0) {
-            std::wcout << "Invalid broadcast IP" << std::endl;
+            logger->log(tablog::ERROR, "Invalid broadcast IP");
             close(serverSocket);
             return;
         }
@@ -65,7 +69,7 @@ namespace tud {
         while (true) {
             std::string message = this->identifier + containerIP;
             if (sendMessageTo(serverSocket, broadcast, message.c_str()) != 0) {
-                std::wcout << "Broadcast failed!" << std::endl;
+                logger->log(tablog::ERROR, "Broadcast failed!");
                 return;
             }
             usleep(100000);
@@ -80,7 +84,7 @@ namespace tud {
     
         udpSocket = socket(AF_INET, SOCK_DGRAM, 0);
         if (udpSocket < 0) {
-            std::wcout << "Create socket failed!" << std::endl;
+            logger->log(tablog::ERROR, "Create socket failed!");
             return;
         }
 
@@ -93,7 +97,7 @@ namespace tud {
         nodeAddress.sin_port = htons(port);
 
         if (bind(udpSocket, (struct sockaddr*)&nodeAddress, sizeof(nodeAddress)) < 0) {
-            std::wcout << "UDP Socket bind failed!" << std::endl;
+            logger->log(tablog::ERROR, "UDP Socket bind failed!");
             return;
         }
 
