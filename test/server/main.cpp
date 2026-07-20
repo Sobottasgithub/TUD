@@ -1,5 +1,6 @@
 #include "server_discovery.h"
 
+#include <tablog_registry.h>
 #include <tablog.h>
 
 #include <iostream>
@@ -12,8 +13,10 @@
 using namespace tud;
 
 int main() {
-    tablog::Tablog* logger = &tablog::Tablog::getInstance();
+    tablog::TablogRegistry* registry = &tablog::TablogRegistry::getInstance();
+    std::shared_ptr<tablog::Tablog> logger = std::make_shared<tablog::Tablog>();
     logger->configure("TUD-server", true);
+    registry->registerLogger("TUD-server", logger);
 
     std::string interface;
     std::cout << "Interface: ";

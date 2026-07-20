@@ -1,5 +1,6 @@
 #include "../include/server_discovery.h"
 
+#include <tablog_registry.h>
 #include <tablog.h>
 
 #include <iostream>
@@ -9,10 +10,15 @@
 #include <thread>
 #include <algorithm>
 #include <optional>
+#include <memory>
 
 namespace tud {
     ServerDiscovery::ServerDiscovery(std::string interface, int inPort, int outPort, std::optional<std::string> identifier) {
-        // logger->configure("ServerUdpDiscovery", true);
+        tablog::TablogRegistry* registry = &tablog::TablogRegistry::getInstance();
+        std::shared_ptr<tablog::Tablog> logger = std::make_shared<tablog::Tablog>();
+        logger->configure("ServerUdpDiscovery", true);
+        registry->registerLogger("ServerUdpDiscovery", logger);
+        this->logger = logger;
 
         this->containerIP = getLocalIpAddress(interface);
         this->broadcastIP = getBroadcastIpAddress();

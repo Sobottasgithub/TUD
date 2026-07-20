@@ -7,6 +7,7 @@
 #include <netinet/in.h>
 #include <vector>
 #include <mutex>
+#include <memory>
 
 namespace tud {
     class Networking
@@ -20,7 +21,7 @@ namespace tud {
             bool isValidIpV4(std::string &ipString);
         
         protected:
-            tablog::Tablog* logger = &tablog::Tablog::getInstance();
+            std::shared_ptr<tablog::Tablog> logger;
             
             int sendMessageTo(int socket, const sockaddr_in& broadcast, std::string payload);
             std::string receiveMessage(int socket);
