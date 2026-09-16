@@ -1,5 +1,7 @@
-#include <iostream>
+#include "peer_discovery.h"
+
+using namespace tud;
 
 int main() {
-  std::cout << "PEER!" << std::endl;
+  tud::PeerDiscovery peerDiscovery;
 }
