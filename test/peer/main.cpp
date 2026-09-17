@@ -38,10 +38,8 @@ int getPort(int argc, char *argv[], std::string argumentName, std::string altern
 int main(int argc, char *argv[]) {  
   std::string interface = getArg(argc, argv, "--interface");
 
-  int broadcastPort = getPort(argc, argv, "--broadcastPort", "-bP");
-  int responsePort = getPort(argc, argv, "--responsePort", "-rsP");
-  int registerPort = getPort(argc, argv, "--registerPort", "-rgP");
+  int port = getPort(argc, argv, "--port", "-p");
   
-  tud::PeerDiscovery peerDiscovery(interface, broadcastPort, responsePort, registerPort, std::nullopt);
+  tud::PeerDiscovery peerDiscovery(interface, port);
 }
 

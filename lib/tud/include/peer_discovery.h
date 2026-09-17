@@ -6,21 +6,14 @@
 namespace tud {
   class PeerDiscovery: public Networking {
     public:
-      PeerDiscovery(std::string interface,
-                    int broadcastPort,
-                    int responsePort,
-                    int registerPort,
-                    std::optional<std::string> identifier);
+      PeerDiscovery(std::string interface, int port);
+      
     private:
       std::string broadcastIP;
-      int broadcastPort;
-      int responsePort;
-      int registerPort;
+      int port;
 
       void discoveryResponseCycle();
-      void discoveryBroadcastCycle();
-      void discoveredRegisterCycle();
-      
+      void discoveryBroadcastCycle();      
   };
 }
 
