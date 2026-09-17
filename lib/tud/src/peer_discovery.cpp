@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <cstring>
+#include <thread>
 
 namespace tud {
   PeerDiscovery::PeerDiscovery(std::string interface,
@@ -20,8 +21,27 @@ namespace tud {
     logger->configure("PeerUdpDiscovery", true);
     registry->registerLogger("ClientUdpDiscovery", logger);
     this->logger = logger;
-    
-    this->logger->log(tablog::DEBUG, "PeerDiscovery");
+
+    std::thread discoveryBroadcastCycleThread([this]() {
+        discoveryBroadcastCycle();
+    });
+
+    std::thread discoveryResponseCycleThread([this]() {
+        discoveryResponseCycle();
+    });
+
+    std::thread discoveredRegisterCycleThread([this]() {
+        discoveredRegisterCycle();
+    });
+
+    if (discoveryBroadcastCycleThread.joinable())
+        discoveryBroadcastCycleThread.join();
+
+    if (discoveryResponseCycleThread.joinable())
+        discoveryResponseCycleThread.join();
+
+    if (discoveredRegisterCycleThread.joinable())
+        discoveredRegisterCycleThread.join();
   }
 
   void PeerDiscovery::discoveryResponseCycle() {
