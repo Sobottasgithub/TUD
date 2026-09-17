@@ -28,6 +28,7 @@ namespace tud {
 
             bool hasSameIdentifier(std::string ipString);
             std::string stripIdentifier(std::string ipString);
+            int generateSeed();
 
             std::vector<std::string> discoveredAddresses = {};
             std::mutex mtx;

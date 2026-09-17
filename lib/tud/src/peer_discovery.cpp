@@ -1,5 +1,6 @@
 #include "../include/peer_discovery.h"
 
+#include <string>
 #include <tablog.h>
 #include <tablog_registry.h>
 
@@ -31,7 +32,7 @@ namespace tud {
     if (identifier.has_value()) {
         this->identifier = identifier.value();
     } else {
-        // TODO: gernerate custom identifier
+        this->identifier = "tud-peer-" + std::to_string(generateSeed());
     }
 
     std::thread discoveryBroadcastCycleThread([this]() {
