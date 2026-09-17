@@ -22,6 +22,18 @@ namespace tud {
     registry->registerLogger("ClientUdpDiscovery", logger);
     this->logger = logger;
 
+    this->containerIP = getLocalIpAddress(interface);
+
+    this->broadcastPort = broadcastPort;
+    this->responsePort = responsePort;
+    this->registerPort = registerPort;
+
+    if (identifier.has_value()) {
+        this->identifier = identifier.value();
+    } else {
+        // TODO: gernerate custom identifier
+    }
+
     std::thread discoveryBroadcastCycleThread([this]() {
         discoveryBroadcastCycle();
     });
