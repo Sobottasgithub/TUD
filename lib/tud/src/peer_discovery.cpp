@@ -24,6 +24,7 @@ namespace tud {
     this->logger = logger;
 
     this->containerIP = getLocalIpAddress(interface);
+    this->broadcastIP = getBroadcastIpAddress();
 
     this->broadcastPort = broadcastPort;
     this->responsePort = responsePort;
@@ -85,7 +86,7 @@ namespace tud {
       // UDP send socket
       int udpSendSocket;
       struct sockaddr_in serverAddress{}, receiverAddress{};
-      const int sendPort = this->outPort;
+      const int sendPort = this->responsePort;
 
       // Create socket
       if ((udpSendSocket = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
@@ -133,7 +134,7 @@ namespace tud {
     void PeerDiscovery::discoveryBroadcastCycle() {
         int serverSocket;
         struct sockaddr_in broadcast{}, receiverAddress{};
-        const int port = this->inPort;
+        const int port = this->broadcastPort;
 
         // Create socket
         if ((serverSocket = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
@@ -179,7 +180,7 @@ namespace tud {
 
     void PeerDiscovery::discoveredRegisterCycle() {
         int udpSocket;
-        const int port = this->outPort; 
+        const int port = this->registerPort; 
     
         udpSocket = socket(AF_INET, SOCK_DGRAM, 0);
         if (udpSocket < 0) {
