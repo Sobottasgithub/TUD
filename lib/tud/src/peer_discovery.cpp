@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <thread>
+#include<bits/stdc++.h>
 
 namespace tud {
   PeerDiscovery::PeerDiscovery(std::string interface, int port) {
@@ -75,12 +76,12 @@ namespace tud {
         }
 
         if (!hasSameIdentifier(receivedMessage)) {
-            this->logger->log(tablog::CRITICAL, "-->" + receivedMessage);
-            std::string masterIP = stripIdentifier(receivedMessage);
-
-            if (isValidIpV4(masterIP)) {
-                if (std::find(discoveredAddresses.begin(), discoveredAddresses.end(), masterIP) == discoveredAddresses.end()) {
-                    discoveredAddresses.push_back(masterIP);
+            std::tuple<std::string, std::string> messageParts = stripUniqueIdentifier(receivedMessage);
+            auto& [identifier, peerIP] = messageParts;
+            this->logger->log(tablog::CRITICAL, "I:" + identifier + " P:" + peerIP);
+            if (isValidIpV4(peerIP)) {
+                if (std::find(discoveredAddresses.begin(), discoveredAddresses.end(), peerIP) == discoveredAddresses.end()) {
+                    discoveredAddresses.push_back(peerIP);
                 }
             }
         }
@@ -131,5 +132,27 @@ namespace tud {
     }
 
     close(serverSocket);
+  }
+
+  std::tuple<std::string, std::string> PeerDiscovery::stripUniqueIdentifier(std::string peerMessage) {
+    size_t firstDash = peerMessage.find('-');
+    if (firstDash == std::string::npos) {
+        return {};
+    }
+
+    size_t secondDash = peerMessage.find('-', firstDash + 1);
+    if (secondDash == std::string::npos) {
+        return {};
+    }
+
+    size_t thirdDash = peerMessage.find('-', secondDash + 1);
+    if (thirdDash == std::string::npos) {
+        return {};
+    }
+
+    std::string identifier = peerMessage.substr(secondDash + 1, thirdDash - (secondDash + 1));
+    std::string ipAddress  = peerMessage.substr(thirdDash + 1);
+    
+    return make_tuple(identifier, ipAddress);
   }
 }

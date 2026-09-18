@@ -3,6 +3,8 @@
 
 #include "networking.h"
 
+#include<bits/stdc++.h>
+
 namespace tud {
   class PeerDiscovery: public Networking {
     public:
@@ -13,7 +15,9 @@ namespace tud {
       int port;
 
       void discoveryResponseCycle();
-      void discoveryBroadcastCycle();      
+      void discoveryBroadcastCycle();
+
+      std::tuple<std::string, std::string> stripUniqueIdentifier(std::string peerMessage);
   };
 }
 
