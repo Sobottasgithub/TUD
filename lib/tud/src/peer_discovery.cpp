@@ -74,7 +74,7 @@ namespace tud {
             continue;
         }
 
-        if (hasSameIdentifier(receivedMessage)) {
+        if (!hasSameIdentifier(receivedMessage)) {
             this->logger->log(tablog::CRITICAL, "-->" + receivedMessage);
             std::string masterIP = stripIdentifier(receivedMessage);
 
