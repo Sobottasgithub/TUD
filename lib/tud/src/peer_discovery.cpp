@@ -41,6 +41,31 @@ namespace tud {
         discoveryResponseCycleThread.join();
   }
 
+  std::vector<std::string> PeerDiscovery::getDiscoveredAddresses() {
+    std::lock_guard<std::mutex> lock(mtx);
+    
+    std::vector<std::string> ips;
+    for (auto iterator = this->discoveredPeers.begin();
+         iterator != this->discoveredPeers.end();
+         ++iterator) {
+        ips.push_back(iterator->first);
+    }
+
+    return ips;
+  }
+  
+  void PeerDiscovery::removeDiscoveredAddress(std::string address) {
+    std::lock_guard<std::mutex> lock(mtx);
+    for (auto iterator = this->discoveredPeers.begin();
+         iterator != this->discoveredPeers.end();
+         ++iterator) {
+        if (iterator->second == address) {
+            this->discoveredPeers.erase(iterator);
+            return;
+        }
+    } 
+  }
+
   void PeerDiscovery::discoveryResponseCycle() {
     const int port = this->port; 
 
