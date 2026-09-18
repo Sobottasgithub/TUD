@@ -78,10 +78,10 @@ namespace tud {
         if (!hasSameIdentifier(receivedMessage)) {
             std::tuple<std::string, std::string> messageParts = stripUniqueIdentifier(receivedMessage);
             auto& [identifier, peerIP] = messageParts;
-            this->logger->log(tablog::CRITICAL, "I:" + identifier + " P:" + peerIP);
             if (isValidIpV4(peerIP)) {
-                if (std::find(discoveredAddresses.begin(), discoveredAddresses.end(), peerIP) == discoveredAddresses.end()) {
-                    discoveredAddresses.push_back(peerIP);
+                if (discoveredPeers.find(identifier) == discoveredPeers.end()) {
+                    discoveredPeers[identifier] = peerIP;
+                    this->logger->log(tablog::CRITICAL, "I:" + identifier + " P:" + peerIP);
                 }
             }
         }

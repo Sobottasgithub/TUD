@@ -3,7 +3,8 @@
 
 #include "networking.h"
 
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
+#include <unordered_map>
 
 namespace tud {
   class PeerDiscovery: public Networking {
@@ -13,6 +14,7 @@ namespace tud {
     private:
       std::string broadcastIP;
       int port;
+      std::map<std::string, std::string> discoveredPeers;
 
       void discoveryResponseCycle();
       void discoveryBroadcastCycle();
