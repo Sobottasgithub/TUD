@@ -10,6 +10,7 @@ namespace tud {
   class PeerDiscovery: public Networking {
     public:
       PeerDiscovery(std::string interface, int port);
+      void discoveryCycle();
 
       std::vector<std::string> getDiscoveredAddresses();
       void removeDiscoveredAddress(std::string address);

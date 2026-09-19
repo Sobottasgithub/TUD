@@ -4,7 +4,6 @@
 #include <tablog.h>
 #include <tablog_registry.h>
 
-#include <algorithm>
 #include <memory>
 #include <unistd.h>
 #include <arpa/inet.h>
@@ -25,7 +24,9 @@ namespace tud {
     this->port = port;
 
     this->identifier = "tud-peer-" + std::to_string(generateSeed()) + "-";
-
+  }
+  
+  void PeerDiscovery::discoveryCycle() {
     std::thread discoveryBroadcastCycleThread([this]() {
         discoveryBroadcastCycle();
     });
@@ -106,7 +107,6 @@ namespace tud {
             if (isValidIpV4(peerIP)) {
                 if (discoveredPeers.find(identifier) == discoveredPeers.end()) {
                     discoveredPeers[identifier] = peerIP;
-                    this->logger->log(tablog::CRITICAL, "I:" + identifier + " P:" + peerIP);
                 }
             }
         }

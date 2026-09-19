@@ -4,8 +4,8 @@
 #include <string>
 #include <memory>
 #include <optional>
+#include <thread>
 
-#include <tablog_registry.h>
 #include <tablog.h>
 
 using namespace tud;
@@ -35,11 +35,29 @@ int getPort(int argc, char *argv[], std::string argumentName, std::string altern
   }
 }
 
-int main(int argc, char *argv[]) {  
+int main(int argc, char *argv[]) {
+  std::shared_ptr<tablog::Tablog> logger = std::make_shared<tablog::Tablog>();
+  logger->configure("TUD-peer", true);
+
   std::string interface = getArg(argc, argv, "--interface");
 
   int port = getPort(argc, argv, "--port", "-p");
   
-  tud::PeerDiscovery peerDiscovery(interface, port);
+  auto peerDiscovery = std::make_shared<tud::PeerDiscovery>(interface, port);
+  std::thread peerDiscoveryThread([peerDiscovery]() {
+    peerDiscovery->discoveryCycle();
+  });
+
+  logger->log(tablog::INFO, "~~ Discovered Addresses ~~");
+  std::vector<std::string> discoveredAddresses;
+  while(true) {
+    std::vector<std::string> newDiscoveries = peerDiscovery->getDiscoveredAddresses();
+    for (int index = 0; index < newDiscoveries.size(); index++) {
+      if(std::find(discoveredAddresses.begin(), discoveredAddresses.end(), newDiscoveries[index]) == discoveredAddresses.end()) {
+        logger->log(tablog::INFO, "--> " + newDiscoveries[index]);
+        discoveredAddresses.push_back(newDiscoveries[index]);
+      }
+    }
+  }
 }
 
