@@ -3,7 +3,6 @@
 #include <tablog_registry.h>
 #include <tablog.h>
 
-#include <iostream>
 #include <unistd.h>
 #include <cstring>
 #include <arpa/inet.h>

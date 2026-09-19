@@ -1,0 +1,63 @@
+#include "peer_discovery.h"
+
+#include <stdexcept>
+#include <string>
+#include <memory>
+#include <optional>
+#include <thread>
+
+#include <tablog.h>
+
+using namespace tud;
+
+std::string getArg(int argc, char *argv[], std::string argumentName) {
+  for(int index = 0; index < argc; index++) {
+    if (std::string(argv[index]).rfind(argumentName, 0) == 0) {
+      std::string argument = argv[index+1];
+      return argument;
+    }
+  }
+  std::string errorMessage = "Unable to find " + argumentName;
+  throw std::invalid_argument(errorMessage);
+}
+
+int getPort(int argc, char *argv[], std::string argumentName, std::string alternativArgumentName) {
+  try {
+    std::string stringPort = getArg(argc, argv, argumentName);
+    // WARNING: it is not checked if stringPort is an int because it is supposed to throw an error
+    // when a faulty port is provided!
+    return std::stoi(stringPort);
+  } catch (const std::invalid_argument& invalidArgument) {
+    std::string stringPort = getArg(argc, argv, alternativArgumentName);
+    // WARNING: it is not checked if stringPort is an int because it is supposed to throw an error
+    // when a faulty port is provided!
+    return std::stoi(stringPort);
+  }
+}
+
+int main(int argc, char *argv[]) {
+  std::shared_ptr<tablog::Tablog> logger = std::make_shared<tablog::Tablog>();
+  logger->configure("TUD-peer", true);
+
+  std::string interface = getArg(argc, argv, "--interface");
+
+  int port = getPort(argc, argv, "--port", "-p");
+  
+  auto peerDiscovery = std::make_shared<tud::PeerDiscovery>(interface, port);
+  std::thread peerDiscoveryThread([peerDiscovery]() {
+    peerDiscovery->discoveryCycle();
+  });
+
+  logger->log(tablog::INFO, "~~ Discovered Addresses ~~");
+  std::vector<std::string> discoveredAddresses;
+  while(true) {
+    std::vector<std::string> newDiscoveries = peerDiscovery->getDiscoveredAddresses();
+    for (int index = 0; index < newDiscoveries.size(); index++) {
+      if(std::find(discoveredAddresses.begin(), discoveredAddresses.end(), newDiscoveries[index]) == discoveredAddresses.end()) {
+        logger->log(tablog::INFO, "--> " + newDiscoveries[index]);
+        discoveredAddresses.push_back(newDiscoveries[index]);
+      }
+    }
+  }
+}
+

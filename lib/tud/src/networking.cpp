@@ -2,7 +2,6 @@
 
 #include <tablog.h>
 
-#include <iostream>
 #include <sys/poll.h>
 #include <netinet/in.h>
 #include <vector>
@@ -14,6 +13,9 @@
 #include <arpa/inet.h>
 #include <regex>
 #include <string>
+#include <random>
+#include <chrono>
+#include <thread>
 
 namespace tud {
   int Networking::sendMessageTo(int socket, const sockaddr_in& broadcast, std::string payload) {
@@ -172,5 +174,22 @@ namespace tud {
   std::string Networking::identifierEscapeRegex(const std::string& identifier) {
       static const std::regex special_chars(R"([-[\]{}()*+?.,\^$|#\s])");
       return std::regex_replace(identifier, special_chars, R"(\$&)");
+  }
+
+  int Networking::generateSeed() {
+    // Generate "truely" random number
+    std::random_device randomDevice;
+    std::int64_t now = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    std::size_t threadId = std::hash<std::thread::id>{}(std::this_thread::get_id());
+    std::seed_seq seedData{
+        randomDevice(),
+        randomDevice(),
+        static_cast<unsigned int>(now),
+        static_cast<unsigned int>(now >> 32),
+        static_cast<unsigned int>(threadId)
+    };
+    std::mt19937 generator = std::mt19937(seedData);
+    std::uniform_int_distribution<int> distribution(1000, 9999);
+    return distribution(generator);
   }
 }

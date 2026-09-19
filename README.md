@@ -1,4 +1,5 @@
 # TUD
+## Client - Server discovery
 The ```Tablo Udp Discovery``` module can be used to easely implement UDP discovery into your project.
 
 To use TUD in your project you need to include it first.
@@ -38,4 +39,24 @@ void removeDiscoveredAddress(std::string address);
 std::string getLocalIpAddress(std::string interface);
 std::string getBroadcastIpAddress();
 bool isValidIpV4(std::string &ipString);
+```
+## Peer discovery
+If you have multiple peers that need to discover each other via broadcast, you can use peer mode as follows:
+```cpp
+#include "peer_discovery.h"
+```
+
+```cpp
+auto peerDiscovery = std::make_shared<tud::PeerDiscovery>(INTERFACE, PORT);
+std::thread peerDiscoveryThread([peerDiscovery]() {
+  peerDiscovery->discoveryCycle();
+});
+```
+After setting up peer discovery, you can use it via the following API functions:
+```cpp
+std::vector<std::string> getDiscoveredAddresses();
+std::vector<std::string> getDiscoveredIdentifiers();
+std::map<std::string, std::string> getDiscoveredPeers();
+      
+void removeDiscoveredAddress(std::string address);
 ```

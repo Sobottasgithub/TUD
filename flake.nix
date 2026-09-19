@@ -38,6 +38,7 @@
           enableLib ? false,
           enableClient ? false,
           enableServer ? false,
+          enablePeer ? false,
           extraInputs ? [ ],
         }:
         pkgs.stdenv.mkDerivation {
@@ -51,7 +52,8 @@
               -DCMAKE_BUILD_TYPE=Release \
               -DDEF_TUD=${if enableLib then "ON" else "OFF"} \
               -DDEF_CLIENT=${if enableClient then "ON" else "OFF"} \
-              -DDEF_SERVER=${if enableServer then "ON" else "OFF"}
+              -DDEF_SERVER=${if enableServer then "ON" else "OFF"} \
+              -DDEF_PEER=${if enablePeer then "ON" else "OFF"}
           '';
 
           buildPhase = ''
@@ -93,12 +95,20 @@
             extraInputs = [ lib ];
           };
 
+          peer = mkTUDPackage {
+            pname = "tud-peer";
+            buildTarget = "tud-peer";
+            enablePeer = true;
+            extraInputs = [ lib ];
+          };
+
           full = mkTUDPackage {
             pname = "libtud-full";
             buildTarget = "all";
             enableLib = true;
             enableServer = true;
             enableClient = true;
+            enablePeer = false;
           };
 
           default = self.packages.${system}.lib;
