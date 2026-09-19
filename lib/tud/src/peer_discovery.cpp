@@ -43,13 +43,30 @@ namespace tud {
   }
 
   std::vector<std::string> PeerDiscovery::getDiscoveredAddresses() {
+    return getDiscovered(0);
+  }
+
+  std::vector<std::string> PeerDiscovery::getDiscoveredIdentifiers() {
+    return getDiscovered(1);
+  }
+
+  std::map<std::string, std::string> PeerDiscovery::getDiscoveredPeers() {
+    std::lock_guard<std::mutex> lock(mtx);
+    return this->discoveredPeers;
+  }
+
+  std::vector<std::string> PeerDiscovery::getDiscovered(bool option) {
     std::lock_guard<std::mutex> lock(mtx);
     
     std::vector<std::string> ips;
     for (auto iterator = this->discoveredPeers.begin();
          iterator != this->discoveredPeers.end();
          ++iterator) {
-        ips.push_back(iterator->first);
+        if (option) {
+            ips.push_back(iterator->first);
+        } else {
+            ips.push_back(iterator->second);
+        }
     }
 
     return ips;

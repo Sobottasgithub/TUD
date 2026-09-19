@@ -13,11 +13,17 @@ namespace tud {
       void discoveryCycle();
 
       std::vector<std::string> getDiscoveredAddresses();
+      std::vector<std::string> getDiscoveredIdentifiers();
+      std::map<std::string, std::string> getDiscoveredPeers();
+      
       void removeDiscoveredAddress(std::string address);
       
     private:
       std::string broadcastIP;
       int port;
+
+      std::vector<std::string> getDiscovered(bool option);
+      
       std::map<std::string, std::string> discoveredPeers;
 
       void discoveryResponseCycle();
