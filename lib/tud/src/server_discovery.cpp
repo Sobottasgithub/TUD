@@ -94,7 +94,19 @@ namespace tud {
         }
 
         int broadcast = 1;
-        setsockopt(udpSocket, SOL_SOCKET, SO_BROADCAST, &broadcast, sizeof(broadcast));
+        if (setsockopt(udpSocket, SOL_SOCKET, SO_BROADCAST, &broadcast, sizeof(broadcast)) < 0) {
+            logger->log(tablog::ERROR, "Failed to enable broadcast!");
+            close(udpSocket);
+            return;
+        }
+
+        // Allow reuse
+        int reuse = 1;
+        if (setsockopt(udpSocket, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) < 0) {
+            logger->log(tablog::ERROR, "Setsockopt failed!");
+            close(udpSocket);
+            return;
+        }
 
         sockaddr_in nodeAddress{};
         nodeAddress.sin_family = AF_INET;

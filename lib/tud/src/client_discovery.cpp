@@ -47,6 +47,12 @@ namespace tud {
         nodeAddress.sin_addr.s_addr = htonl(INADDR_ANY);
         nodeAddress.sin_port = htons(port);
 
+        int reuse = 1;
+        if (setsockopt(udpSocket, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) < 0) {
+            logger->log(tablog::ERROR, "Setsockopt failed!");
+            return;
+        }
+
         if (bind(udpSocket, (struct sockaddr*)&nodeAddress, sizeof(nodeAddress)) < 0) {
             logger->log(tablog::ERROR, "UDP Socket bind failed!");
             return;
@@ -63,7 +69,6 @@ namespace tud {
             return;
         }
         // Allow reuse
-        int reuse = 1;
         if (setsockopt(udpSendSocket, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) < 0) {
             logger->log(tablog::ERROR, "Setsockopt failed!");
             return;

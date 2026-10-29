@@ -22,7 +22,7 @@ int main() {
     std::cout << "Interface: ";
     std::cin >> interface;
       
-    auto serverDiscovery = std::make_shared<tud::ServerDiscovery>(interface, 4000, 4001, "tud");
+    auto serverDiscovery = std::make_shared<tud::ServerDiscovery>(interface, 4000, 4000, "tud");
     std::thread serverDiscoveryThread([serverDiscovery]() {
       serverDiscovery->discoveryCycle();
     });
