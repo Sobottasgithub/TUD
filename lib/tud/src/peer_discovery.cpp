@@ -114,7 +114,7 @@ namespace tud {
         std::string receivedMessage = receiveMessage(udpSocket);
 
         if (receivedMessage.empty()) {
-            usleep(10000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
             continue;
         }
 
@@ -170,7 +170,7 @@ namespace tud {
         if (sendMessageTo(serverSocket, broadcastAddress, message.c_str()) != 0) {
             logger->log(tablog::ERROR, "Broadcast send failed!");
         }
-        usleep(100000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
 
     close(serverSocket);

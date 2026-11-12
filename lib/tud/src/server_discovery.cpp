@@ -1,5 +1,6 @@
 #include "../include/server_discovery.h"
 
+#include <chrono>
 #include <tablog_registry.h>
 #include <tablog.h>
 
@@ -77,7 +78,7 @@ namespace tud {
                 logger->log(tablog::ERROR, "Broadcast failed!");
                 return;
             }
-            usleep(100000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
 
         receiveDiscoveredCycleThread.join();
