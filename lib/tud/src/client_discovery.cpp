@@ -74,7 +74,7 @@ namespace tud {
             return;
         }
     
-        while (true) {
+        while (isConnected()) {
             // Get UDP Discovery packet
             std::string receivedMessage = receiveMessage(udpSocket);
             if (hasSameIdentifier(receivedMessage)) {

@@ -16,9 +16,12 @@ namespace tud {
             std::vector<std::string> getDiscoveredAddresses();
             void removeDiscoveredAddress(std::string address);
 
-            std::string getLocalIpAddress(std::string interface);
-            std::string getBroadcastIpAddress();
-            bool isValidIpV4(std::string &ipString);
+            static std::string getLocalIpAddress(std::string interface);
+            static std::string getBroadcastIpAddress();
+            static bool isValidIpV4(std::string &ipString);
+
+            bool isConnected();
+            void disconnect();
         
         protected:
             std::shared_ptr<tablog::Tablog> logger;
@@ -37,6 +40,9 @@ namespace tud {
             int outPort;
 
             std::string identifier = "tud";
+
+            std::mutex isConnectedMutex;
+            bool connected = true;
 
         private:
             std::string identifierEscapeRegex(const std::string& text);

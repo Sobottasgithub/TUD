@@ -71,7 +71,7 @@ namespace tud {
             return;
         }
 
-        while (true) {
+        while (isConnected()) {
             std::string message = this->identifier + containerIP;
             if (sendMessageTo(serverSocket, broadcast, message.c_str()) != 0) {
                 logger->log(tablog::ERROR, "Broadcast failed!");
@@ -118,7 +118,7 @@ namespace tud {
             return;
         }
 
-        while (true) {
+        while (isConnected()) {
             std::string receivedMessage = receiveMessage(udpSocket);
             if (hasSameIdentifier(receivedMessage)) {
                 std::string newAddress = stripIdentifier(receivedMessage);

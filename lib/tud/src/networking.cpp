@@ -158,6 +158,16 @@ namespace tud {
     return true;
   }
 
+  bool Networking::isConnected() {
+    std::lock_guard<std::mutex> lock(isConnectedMutex);
+    return this->connected;
+  }
+  
+  void Networking::disconnect() {
+    std::lock_guard<std::mutex> lock(isConnectedMutex);
+    this->connected = false;
+  }
+
   bool Networking::hasSameIdentifier(std::string ipString) {
     std::string identifierPattern = "^" + identifierEscapeRegex(this->identifier);
     std::regex pattern(identifierPattern);
