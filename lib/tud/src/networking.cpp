@@ -28,24 +28,30 @@ namespace tud {
   }
 
   std::string Networking::receiveMessage(int socket) {
-    std::string data;
     pollfd pfd{};
     pfd.fd = socket;
     pfd.events = POLLIN;
 
     int ret = poll(&pfd, 1, 10000);
 
+    if (ret < 0) {
+      logger->log(tablog::ERROR, "Poll error");
+      return "";
+    }
+
+    if (ret == 0) {
+      return "";
+    }
+
     int bufferSize = 1024;
     if (ret > 0 && (pfd.revents & POLLIN)) {
         char* buffer = new char[bufferSize];
         ssize_t size = recv(socket, buffer, bufferSize, 0);
-      
-        data = buffer;
-    
-        if (size <= 0) return data;
-        return data;
+          
+        if (size <= 0) return buffer;
+        return buffer;
     }
-    return data;
+    return "";
   }
 
   std::vector<std::string> Networking::getDiscoveredAddresses() {
