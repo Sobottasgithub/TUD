@@ -13,7 +13,7 @@
 #include <memory>
 
 namespace tud {
-    ServerDiscovery::ServerDiscovery(std::string interface, int inPort, int outPort, std::optional<std::string> identifier) {
+    ServerDiscovery::ServerDiscovery(std::string interface, int inPort, int outPort, std::optional<std::string> identifier, const int interval) {
         tablog::TablogRegistry* registry = &tablog::TablogRegistry::getInstance();
         std::shared_ptr<tablog::Tablog> logger = std::make_shared<tablog::Tablog>();
         logger->configure("ServerUdpDiscovery", true);
@@ -25,6 +25,8 @@ namespace tud {
 
         this->inPort = inPort;
         this->outPort = outPort;
+
+        this->interval = interval;
 
         if(identifier.has_value()) {
             this->identifier = identifier.value();
@@ -78,7 +80,7 @@ namespace tud {
                 logger->log(tablog::ERROR, "Broadcast failed!");
                 return;
             }
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            std::this_thread::sleep_for(std::chrono::milliseconds(this->interval));
         }
 
         receiveDiscoveredCycleThread.join();
