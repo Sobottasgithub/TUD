@@ -9,7 +9,7 @@
 namespace tud {
   class PeerDiscovery: public Networking {
     public:
-      PeerDiscovery(std::string interface, int port);
+      PeerDiscovery(std::string interface, int port, const int interval = 1000);
       void discoveryCycle();
 
       std::vector<std::string> getDiscoveredAddresses();
@@ -21,6 +21,7 @@ namespace tud {
     private:
       std::string broadcastIP;
       int port;
+      int interval = 0;
 
       std::vector<std::string> getDiscovered(bool option);
       

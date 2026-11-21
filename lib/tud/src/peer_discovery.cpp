@@ -11,7 +11,7 @@
 #include<bits/stdc++.h>
 
 namespace tud {
-  PeerDiscovery::PeerDiscovery(std::string interface, int port) {
+  PeerDiscovery::PeerDiscovery(std::string interface, int port, const int interval) {
     tablog::TablogRegistry* registry = &tablog::TablogRegistry::getInstance();
     std::shared_ptr<tablog::Tablog> logger = std::make_shared<tablog::Tablog>();
     logger->configure("PeerUdpDiscovery", true);
@@ -22,6 +22,8 @@ namespace tud {
     this->broadcastIP = getBroadcastIpAddress();
 
     this->port = port;
+
+    this->interval = interval;
 
     this->identifier = "tud-peer-" + std::to_string(generateSeed()) + "-";
   }
@@ -114,7 +116,7 @@ namespace tud {
         std::string receivedMessage = receiveMessage(udpSocket);
 
         if (receivedMessage.empty()) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            std::this_thread::sleep_for(std::chrono::milliseconds(this->interval));
             continue;
         }
 
@@ -170,7 +172,7 @@ namespace tud {
         if (sendMessageTo(serverSocket, broadcastAddress, message.c_str()) != 0) {
             logger->log(tablog::ERROR, "Broadcast send failed!");
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        std::this_thread::sleep_for(std::chrono::milliseconds(this->interval));
     }
 
     close(serverSocket);
